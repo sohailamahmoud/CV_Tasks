@@ -10,17 +10,24 @@ def harrisCorner(image ,k):
     # Start the timer
     start_time = time.time()
     src = np.copy(image)
+    # Load the image in grayscale
     src = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
 
+    # Compute the x and y derivatives using the Sobel operator
     Ix = cv2.Sobel(src, cv2.CV_64F, 1, 0, ksize=5)
     Iy = cv2.Sobel(src, cv2.CV_64F, 0, 1, ksize=5)
+    
+    # Compute the elements of the structure tensor M
     Ixx = cv2.GaussianBlur(src=Ix ** 2, ksize=(5, 5), sigmaX=0)
     Ixy = cv2.GaussianBlur(src=Iy * Ix, ksize=(5, 5), sigmaX=0)
     Iyy = cv2.GaussianBlur(src=Iy ** 2, ksize=(5, 5), sigmaX=0)
 
+    # Compute the Harris response
     det = Ixx *Iyy - (Ixy**2)
     trace = Ixx + Iyy
     harrisResponse = det - k * (trace **2)
+    
+     # Threshold the Harris response to obtain corner candidates
     cornerThreshold = 0.01 
     cop_harris = np.copy(harrisResponse)
     harrisMatrix =cv2.dilate(cop_harris,None)
