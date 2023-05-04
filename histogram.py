@@ -13,7 +13,7 @@ def global_thresholding(img,threshold):
     Thresholded_img=thresholding(img,threshold)
     return Thresholded_img
 
-def local_thresholding(img,th1,th2,th3,th4):
+def localThresholding(img,th1,th2,th3,th4):
     ############splitting image###########
     h, w = img.shape
     half = w//2
