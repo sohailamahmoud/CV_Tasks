@@ -2,6 +2,7 @@ import streamlit as st
 import cv2
 import time
 import Hough , ActiveContour, Sift , MatchingFeatures , harrisDetector
+from faceDetectRecognition import * 
 from segmentation import *
 from thresholding import *
 from filter import *
@@ -53,7 +54,7 @@ local_css("style.css")
 
 
 
-tab1, tab2,tab3,tab4,tab5,tab6,tab7, tab8 , tab9= st.tabs(["Filters", "Histogram", "Frequency","Shape Detections", "Contour","Harris corners","Features Matching","Thresholding","Segmentation"])
+tab1, tab2,tab3,tab4,tab5,tab6,tab7, tab8 , tab9, tab10, tab11 = st.tabs(["Filters", "Histogram", "Frequency","Shape Detections", "Contour","Harris corners","Features Matching","Thresholding","Segmentation","Face Detection", "Face Recognition"])
 
 
 with st.sidebar:
@@ -104,6 +105,16 @@ with st.sidebar:
             if (btn_segment=='Agglomerative'):
                 initial_cluster = st.number_input('Number of Initial Clusters',min_value=1, max_value=100, value=25, step=1)
                 final_cluster = st.number_input('Number of Final Clusters',min_value=1, max_value=100, value=10, step=1)
+    
+    with st.expander("Face Detection",expanded= False):
+        scale_factor = st.number_input('Scale Factor',min_value=0.0, max_value=10.0, value=1.4, step=0.1)
+        min_neighbour = st.number_input('minimum neighbor',min_value=1, max_value=100, value=5, step=1)
+    
+    with st.expander("Face Recognition",expanded= False):
+        width = st.number_input('Width',min_value=1, max_value=200, value=64, step=1)
+        height = st.number_input('Height',min_value=1, max_value=200, value=64, step=1)
+        Euclidean_threshold = st.number_input('Threshold for the accepted Euclidean Distance',min_value=1, max_value=1000, value=200, step=1)
+    
         
     
 
@@ -655,3 +666,88 @@ with tab9:
             axs[1].set_title('Segmented Image')
             plt.savefig("images/segmentedOutput.png")
             st.image("images/segmentedOutput.png", caption='Segmented image' ,width=600) 
+
+
+
+
+with tab10:
+    image_for_detect= st.file_uploader ("Upload Image ", type= ["jpg","png","bmp","jpeg","pgm"], accept_multiple_files=False, key='file1', help=None, on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
+    
+    with st.container():
+        col1,col2 = st.columns([2,2])
+        if image_for_detect:
+            path_img = "images/" + image_for_detect.name
+            imge=cv2.imread(image_for_detect,cv2.COLOR_BGR2RGB) 
+            imge= cv2.imread(image_for_detect, cv2.IMREAD_GRAYSCALE)
+
+        with col1:
+            if(image_for_detect):
+                st.image(image_for_detect, caption='Original image' ,width=300)
+
+        with col2:
+            if(image_for_detect):
+                faces = detect_faces(path= path_img , scale_factor= scale_factor , min_neighbour= min_neighbour)
+                for (x, y, w, h) in faces:
+                    cv2.rectangle(imge, (x, y), (x+w, y+h), (255, 0, 0), 10)
+                st.image(imge, caption='Detected face' ,width=300)
+            
+
+
+
+
+with tab11:
+    image_recognize= st.file_uploader ("Upload Image ", type= ["jpg","png","bmp","jpeg","pgm"], accept_multiple_files=False, key='file2', help=None, on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
+    
+    with st.container():
+        col1,col2 = st.columns([2,2])
+        if image_recognize:
+            path__Rec_img = image_recognize.name
+            img_Rec=cv2.imread(image_recognize,cv2.COLOR_BGR2RGB) 
+            img_Rec= cv2.imread(image_recognize, cv2.IMREAD_GRAYSCALE)
+
+        with col1:
+            if(image_recognize):
+                st.image(image_recognize, caption='Original image' ,width=300)
+        
+
+        with col2:
+            if(image_recognize):
+                unknown_face = cv2.imread(path__Rec_img)#read the image
+                gray = cv2.cvtColor(unknown_face, cv2.COLOR_BGR2GRAY)
+                unknown_face = cv2.resize(gray, (width, height))#resize with 64*64 shape
+                unknown_face = np.array(unknown_face, dtype='float64').flatten()
+                train_labels, best_match = PCA_APPLY(unknown_face)
+
+                st.image("images\FaceRecognized.png", caption='Best Match' ,width=300)
+    
+
+    with st.container():
+        if(image_recognize):
+            col1,a,col2,b,col3 = st.columns([2,0.2,2,0.2,2])
+
+            st.subheader("Performance of the PCA Model")
+
+            if(image_recognize):
+                test_path="testing/"
+                fpr_values,tpr_values,accuracy,precision,specificity = calculate_performance(test_path=test_path,threshold=Euclidean_threshold,width=width,height=height)
+
+
+            with col1:
+                st.markdown("Accuracy =  ")
+                st.write(accuracy)
+            
+            with col2:
+                st.markdown("Precision =  ")
+                st.write(precision)
+            
+            with col3:
+                st.markdown("Specificity =  ")
+                st.write(specificity)
+                    
+
+        with st.container():
+            if(image_recognize):
+
+                ROC_plot(tpr_values=tpr_values,fpr_values=fpr_values)
+
+                st.image("images/ROC_CURVE.png", caption='ROC Curve' ,width=300)
