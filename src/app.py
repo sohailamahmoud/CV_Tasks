@@ -669,7 +669,7 @@ with tab9:
 
 
 
-
+# face detection tab
 with tab10:
     image_for_detect= st.file_uploader ("Upload Image ", type= ["jpg","png","bmp","jpeg","pgm"], accept_multiple_files=False, key='file1', help=None, on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
     
@@ -694,7 +694,7 @@ with tab10:
 
 
 
-
+# face recognition tab
 with tab11:
     image_recognize= st.file_uploader ("Upload Image ", type= ["jpg","png","bmp","jpeg","pgm"], accept_multiple_files=False, key='file2', help=None, on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
     

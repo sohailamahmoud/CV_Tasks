@@ -339,7 +339,7 @@ Mean shift segmentation is a clustering-based algorithm that is used to group si
 
 Name| Section | Bench Number |
 --- | --- | --- |
-[Maryam Megahed](https://github.com/MaryamMegahed "Maryam Megahed") | 2 | 34
-[Arwa Essam](https://github.com/arwa-essam "Arwa Essam") | 1 | 12
+[Maryam Megahed](https://github.com/MaryamMegahed "Maryam Megahed") | 2 | 32
+[Arwa Essam](https://github.com/arwa-essam "Arwa Essam") | 1 | 10
 [Shrouk Shawky](https://github.com/shirouq-shawky "Shrouk Shawky") | 1 | 46
 [Sohaila Mahmoud](https://github.com/sohailamahmoud "Sohaila Mahmoud") | 1 | 45
