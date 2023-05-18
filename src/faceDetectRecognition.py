@@ -17,7 +17,7 @@ import time
 
 def detect_faces(path,scale_factor = 1.4,min_neighbour = 5):
     # Load the cascade
-    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    face_cascade = cv2.CascadeClassifier('../lib/haarcascade_frontalface_default.xml')
 
     # Read the image and convert to gray scale
     image = cv2.imread(path)
@@ -25,12 +25,6 @@ def detect_faces(path,scale_factor = 1.4,min_neighbour = 5):
 
     # Detect faces
     faces = face_cascade.detectMultiScale(img_gray,scaleFactor=scale_factor,minNeighbors=min_neighbour)
-    
-    # for (x, y, w, h) in faces:
-    #     cv2.rectangle(img_gray, (x, y), (x+w, y+h), (255, 0, 0), 10)
-    # # Display the output
-    # plt.imshow(img_gray, cmap="gray")
-    # plt.show()
 
     return faces
 
@@ -148,7 +142,7 @@ def get_weights(eigenfaces,normalized_faces):
 
 #apply pca
 def PCA_APPLY(unknown_face): 
-    training_path="training/"
+    training_path="../dataset/training/"
     unknown_face_vector = unknown_face#get the flattened array
     train_imgs_paths,trainLabels = get_image_paths(path=training_path)
     training_images=get_array_images(train_imgs_paths)
@@ -167,7 +161,7 @@ def PCA_APPLY(unknown_face):
     print(best_match)
 
     output_image= training_images[best_match].reshape(64,64)
-    saved=mpimg.imsave('images/FaceRecognized.png', output_image,cmap="gray")
+    saved=mpimg.imsave('../images/FaceRecognized.png', output_image,cmap="gray")
 
     return trainLabels,best_match
 
@@ -191,7 +185,7 @@ def calculate_performance(test_path, threshold = 200, width = 64, height = 64):
 
 
     for i , img in enumerate(test_images,start=0):
-        train_labels,best_match = PCA_APPLY(img,width=width,height=height)
+        train_labels,best_match = PCA_APPLY(img)
         bestMatches.append(best_match)
         positive = test_labels[i] == train_labels[best_match]
 
@@ -253,4 +247,4 @@ def ROC_plot(tpr_values,fpr_values):
     plt.ylabel('True Positive Rate')
     plt.title('ROC Curve')
     plt.grid(True)
-    plt.savefig("images/ROC_CURVE.png")
+    plt.savefig("../images/ROC_CURVE.png")
